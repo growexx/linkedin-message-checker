@@ -1,0 +1,124 @@
+/* replace with your css */
+body{
+  margin: 0;
+  padding:0;
+}
+
+.popup {
+  margin-top: 0px;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 200px;
+  width: 200px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+html,
+body,
+.App-header {
+  height: auto;
+  width: auto;
+}
+
+.scaffold-layout-toolbar,
+.global-nav,
+#artdeco-toasts__wormhole,
+#app-boot-bg-loader,
+.global-nav__a11y-menu-container,
+.entity-hovercard,
+.msg-overlay-bubble-header,
+.scaffold-layout__aside,
+.artdeco-card.pv4.ph0,
+.linked-area,
+.entity-result__insights,
+.visually-hidden,
+.entity-result__badge-text,
+.entity-result__actions.entity-result__divider,
+svg,
+.artdeco-pagination__button--previous,
+.artdeco-pagination__button--next,
+.scaffold-layout__footer,
+.pv-text-details__separator,
+.dist-value,
+.text-body-medium.break-words,
+.pv-text-details__right-panel,
+.pv-top-card--list,
+.ivm-image-view-model__img-list--stacked,
+.artdeco-dropdown__content-inner,
+.t-normal.t-black--light.t-14,
+.pv-highlights-section,
+.pv-about-section,
+.pv-deferred-area.ember-view,
+.experience-section,
+.education-section,
+.pv-profile-section--certifications-section,
+.pv-accomplishments-section,
+.global-footer,
+.artdeco-dropdown.artdeco-dropdown--placement-bottom,
+.pv-profile-sticky-header,
+.text-body-small.inline.t-black--light.break-words {
+  display: none;
+}
+li {
+  list-style-type: none;
+}
+.entity-result__item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.EntityPhoto-circle-3-ghost-person {
+  min-width: 50px;
+  background: grey;
+  height: 50px;
+}
+.ivm-image-view-model {
+  margin-right: 20px;
+  min-width: 50px;
+}
+.artdeco-pagination__pages {
+  display: flex;
+}
+.artdeco-pagination__pages li {
+  margin-right: 10px;
+}
+.chat-button {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+}
