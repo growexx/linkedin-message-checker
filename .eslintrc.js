@@ -25,7 +25,7 @@ module.exports = {
         'dot-notation': ['error'],
         'eol-last': ['error', 'always'],
         'func-call-spacing': ['error'],
-        indent: ['error', 4, { SwitchCase: 1 }],
+        // indent: ['error', 4, { SwitchCase: 1 }],
         'key-spacing': [
             'error',
             { beforeColon: false, afterColon: true, mode: 'minimum' }
@@ -65,7 +65,6 @@ module.exports = {
         yoda: ['error'],
         'guard-for-in': ['error'],
         'no-multi-spaces': ['error'],
-        'no-console': 2,
         'no-unused-vars': [
             'error',
             { vars: 'all', args: 'after-used', ignoreRestSiblings: false }
