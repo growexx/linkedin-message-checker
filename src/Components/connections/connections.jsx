@@ -11,7 +11,6 @@ function Connections () {
     const res = await chrome.runtime.sendMessage({
       message: messages.TAB_DETAILS
     });
-    console.log('tab Details', res);
     setTabDetails(res);
   };
   useEffect(() => {
@@ -39,7 +38,6 @@ function Connections () {
       const scrollResponse = await chrome.tabs.sendMessage(tabDetails.tab.id, {
         message: messages.SCROLLMSGCONNECTION
       });
-      console.log('scroll New response', scrollResponse);
       if (scrollResponse?.status === 'OK' && scrollResponse !== undefined) {
         return await chrome.tabs.sendMessage(tabDetails.tab.id, {
           message: messages.EXTRACTMSGCONNECTION

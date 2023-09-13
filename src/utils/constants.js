@@ -32,3 +32,21 @@ export const messages = {
   LOADMOREMSGCONNECTION: 'loadMoreMsgConnection',
   EXTRACTMSGCONNECTION: 'extractMsgConnection'
 };
+
+export const messageConfig = {
+  TOTAL_CONNECTIONS: 15
+};
+
+export const columnsName = {
+  NAME: 'name',
+  ABOUT: 'about',
+  EXPERIENCE: 'experience',
+  SKILLS: 'skills',
+  RECENT_POST: 'recentPost',
+  ACTIVITY: 'activity',
+  POST: 'post'
+};
+
+export const dateConfig = {
+  PAST_DAYS: 30
+};

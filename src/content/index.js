@@ -1,11 +1,6 @@
 /* global chrome*/
-import {
-  columns_name,
-  numbers,
-  date_config,
-  message_config
-} from '../utils/enum';
-import { messages } from '../utils/constants';
+import { numbers } from '../utils/enum';
+import { dateConfig, messageConfig, messages } from '../utils/constants';
 
 let mapContent = {};
 let scrollHeight;
@@ -94,6 +89,7 @@ const scrapePostFunction = async () => {
       if (commentaryDiv) {
         const extractedTextArray = [];
         // Function to recursively extract text from nodes
+        // eslint-disable-next-line no-inner-declarations
         function extractTextFromNode (node) {
           if (node.nodeType === Node.TEXT_NODE) {
             extractedTextArray.push(node.textContent.trim());
@@ -188,41 +184,15 @@ const getListElements = () => {
   });
 };
 
-const mainScrapeFunction = async (url) => {
-  console.log('mainScrapeFunction');
-  const profileDetails = {};
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    left: 0,
-    behavior: 'smooth'
-  });
-  const nameDivs = document.querySelectorAll(
-    'span.entity-result__title-text > a > span > span:first-child'
-  );
-  const names = Array.from(nameDivs).map((x) => x.innerText);
-  console.log('names--', names);
-  const storageNames = document.querySelector(
-    `.${JSON.parse(localStorage.getItem('generalConnections')).profileDetails}`
-  );
-  console.log('1---storageNames--', storageNames);
-  profileDetails[columns_name.NAME] = storageNames;
-  storageNames.concat(names);
-  console.log('2---storageNames--', storageNames);
-  // localStorage.setItem('generalConnections', JSON.stringify({profileDetails}));
-  return true;
-};
-
 const msgScrapeFunction = async (url, csvData) => {
   // get message connections
-  console.log('msgScrapeFunction');
   const msgDivs = document.querySelectorAll(
     'div.msg-conversation-card__row.align-items-center.display-flex'
   );
   const msgConnections = {};
   msgDivs.forEach((element, index) => {
     let date = document
-      .querySelectorAll('time.msg-overlay-list-bubble-item__time-stamp')
-      [index].textContent.trim();
+      .querySelectorAll('time.msg-overlay-list-bubble-item__time-stamp')[index].textContent.trim();
     if (isNaN(Date.parse(date))) {
       date = new Date();
     }
@@ -234,8 +204,7 @@ const msgScrapeFunction = async (url, csvData) => {
       name: document
         .querySelectorAll(
           'h3.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names'
-        )
-        [index].textContent.trim(),
+        )[index].textContent.trim(),
       time: date,
       img: document.querySelectorAll(
         'div.msg-selectable-entity.msg-selectable-entity--3 img'
@@ -243,53 +212,43 @@ const msgScrapeFunction = async (url, csvData) => {
       profile_index: index
     };
   });
-  console.log('msgConnections---', msgConnections);
   localStorage.setItem('msgConnections', JSON.stringify({ msgConnections }));
   return filterMessageConnections(csvData);
 };
 
 const filterMessageConnections = async (csvData) => {
-  console.log('filterMessageConnections');
   let msgConnections = JSON.parse(
     localStorage.getItem('msgConnections')
   ).msgConnections;
   msgConnections = Object.values(msgConnections);
-  console.log('msgConnections---', msgConnections);
   const currentDate = new Date();
   const pastDay = new Date(currentDate);
-  pastDay.setDate(currentDate.getDate() - date_config.PAST_DAYS);
+  pastDay.setDate(currentDate.getDate() - dateConfig.PAST_DAYS);
   const totalFilteredArray = msgConnections.filter((element) => {
     const date = new Date(element.time);
     return date < pastDay; // Filtering past days
   });
-  console.log('totalFilteredArray---', totalFilteredArray);
-  console.log('csvData---', csvData);
   const matchConnection = totalFilteredArray.filter((obj1) =>
     csvData.some((obj2) => obj1.name === obj2.name)
   );
-  console.log('matchConnection---', matchConnection);
   let filteredArray = totalFilteredArray.slice(
     0,
-    message_config.TOTAL_CONNECTIONS
+    messageConfig.TOTAL_CONNECTIONS
   );
   if (matchConnection.length > 0) {
-    if (matchConnection.length < message_config.TOTAL_CONNECTIONS) {
+    if (matchConnection.length < messageConfig.TOTAL_CONNECTIONS) {
       matchConnection.concat(totalFilteredArray);
       const mergedArray = matchConnection.concat(
         totalFilteredArray.filter((item) => !matchConnection.includes(item))
       );
-      filteredArray = mergedArray.slice(0, message_config.TOTAL_CONNECTIONS);
+      filteredArray = mergedArray.slice(0, messageConfig.TOTAL_CONNECTIONS);
     }
 
-    if (matchConnection.length >= message_config.TOTAL_CONNECTIONS) {
-      filteredArray = matchConnection.slice(
-        0,
-        message_config.TOTAL_CONNECTIONS
-      );
+    if (matchConnection.length >= messageConfig.TOTAL_CONNECTIONS) {
+      filteredArray = matchConnection.slice(0, messageConfig.TOTAL_CONNECTIONS);
     }
   }
 
-  console.log('filteredArray---', filteredArray);
   localStorage.setItem(
     'TotalfilterConnection',
     JSON.stringify({ totalFilteredArray })
@@ -299,24 +258,7 @@ const filterMessageConnections = async (csvData) => {
   return filteredArray;
 };
 
-const clickMessageBox = (profile) => {
-  console.log('clickMessageBox----', profile);
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    left: 0,
-    behavior: 'smooth'
-  });
-  document
-    .querySelectorAll('.msg-overlay-list-bubble__convo-card-content')
-    [profile].click();
-  const messages = document.getElementsByClassName(
-    'msg-s-event-with-indicator'
-  );
-  console.log('messages---', messages);
-};
-
 const navigateToProfile = (profile) => {
-  console.log('---navigateToProfile--');
   window.location = profile;
   // scrollToBottom();
 };
@@ -510,22 +452,16 @@ const findMajorityTagNames = (elements) => {
 };
 
 // Function for extracting user selected data points from list
-const currentPageMapping = async (request) => {
+const currentPageMapping = async () => {
   await delay(1000);
   const list = document.querySelectorAll('.entity-result__title-text a > span');
   const data = [];
-  const dataPointsLookup = {};
-  console.log('list---', list);
-  const fields = {};
   // const fieldValueElements = element.querySelectorAll('span.entity-result__title-text.t-16');
-  // console.log('fieldValueElements----', fieldValueElements);
   for (const fieldValueElement of list) {
     const name = fieldValueElement.querySelector('span').textContent.trim();
-    console.log('name---', name);
     data.push(name);
     // return data;
   }
-  console.log('data---', data);
   localStorage.setItem('extractedData', JSON.stringify(data));
   return data;
 };
@@ -555,20 +491,17 @@ const triggerClickOnPageBtn = (parentElement, pageNumber) => {
 
 // Function for scolling the full page
 const scrollToBottom = async () => {
-  console.log('scrollToBottom---');
   window.scrollTo({ top: scrollHeight, left: 0, behavior: 'smooth' });
 };
 
 // extract total pages
 const extractPageNumber = async () => {
-  console.log('extractPageNumber---');
   //  scrollToBottom();
   //  await delay(1000);
   const pageFrom = 1;
   const pageTo = document.querySelectorAll(
     '.artdeco-pagination__indicator'
   ).length;
-  console.log(pageFrom, '---', pageTo);
   return [pageFrom, pageTo];
 };
 
@@ -592,12 +525,13 @@ const isClassVisible = () => {
   return false; // The element with the specified class is not visible
 };
 
+// eslint-disable-next-line consistent-return
 const scrollMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'msg-conversations-container__conversations-list'
   )[0];
-  console.log('in Scroll', element);
   if (element) {
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const isSpecificClassVisible = isClassVisible();
       const isScrollAtEnd =
@@ -609,12 +543,9 @@ const scrollMsgConnection = async () => {
         (isSpecificClassVisible && !isScrollAtEnd)
       ) {
         const result = await loadNextMsgConnection();
-        console.log('result--->', result);
         if (!result) {
-          // return 'Completed'
           return true;
         } else {
-          console.log('completed!!!');
           return false;
         }
       }
@@ -636,7 +567,6 @@ const extractMsgConnection = async () => {
   const list = document.querySelectorAll(
     'div.msg-conversation-card__row.msg-conversation-card__title-row'
   );
-  console.log('list', list);
   const msgConnections = {};
   list.forEach((element, index) => {
     let date = element
@@ -647,12 +577,8 @@ const extractMsgConnection = async () => {
         'h3.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names'
       )
       .textContent.trim();
-    const img = document
-      .querySelectorAll('div.msg-selectable-entity--4')
-      [index].querySelector('div > img')
-      ? document
-          .querySelectorAll('div.msg-selectable-entity--4')
-          [index].querySelector('div > img').currentSrc
+    const img = document.querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img')
+      ? document.querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img').currentSrc
       : '';
     if (isNaN(Date.parse(date))) {
       date = new Date();
@@ -668,7 +594,6 @@ const extractMsgConnection = async () => {
       profile_index: index
     };
   });
-  // console.log('msgConnections---', msgConnections);
   localStorage.setItem('msgConnections', JSON.stringify({ msgConnections }));
   return msgConnections;
 };
@@ -681,7 +606,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       return true;
     }
     case messages.SCRAPE_DETAILS: {
-      console.log('scrape detail case');
       const data = await msgScrapeFunction(request.url, request.csvData);
       sendResponse(data);
       break;
@@ -739,6 +663,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       break;
     }
     case messages.SCROLLMSGCONNECTION: {
+      // eslint-disable-next-line no-unused-vars
       const response = await scrollMsgConnection(request);
       sendResponse({ status: 'OK' });
       return true;
