@@ -1,26 +1,12 @@
-// {
-//   "name": "Social Engagement",
-//   "version": "1.0.0",
-//   "manifest_version": 2,
-//   "description": "Social Engagement",
-//   "icons": {
-//     "512": "logo512.png"
-//   },
-//   "browser_action": {
-//     "default_icon": "logo512.png",
-//     "default_popup": "popup.html"
-//   },
-//   "permissions": ["history", "activeTab", "tabs"]
-// }
 {
-  "name": "LinkedIn Automation Window",
-  "description": "LinkedIn Automation Window",
+  "name": "LinkedIn Message Checker",
+  "description": "LinkedIn Message Checker",
   "version": "1.0.0",
   "manifest_version": 3,
   "author": "Growexx",
   "icons": {
-    "192": "icons/logo192.png",
-    "512": "icons/logo512.png"
+    "192": "icons/icon-192x192.png",
+    "512": "icons/icon-512x512.png"
   },
   "background": {
     "service_worker": "background.js"
