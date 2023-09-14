@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { LINKDIN_MSG_URL, messages } from '../../utils/constants';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import DataTable from 'react-data-table-component';
+import moment from 'moment';
 
 function Connections () {
   const [tabDetails, setTabDetails] = useState({});
@@ -22,12 +23,12 @@ function Connections () {
   }, []);
   // const defaultImageSrc = 'img/default-user-image.png';
 
-  const openMessageBox = async (profile) => {
-    return await chrome.tabs.sendMessage(tabDetails.tab.id, {
-      message: messages.OPEN_PROFILE,
-      profile: profile
-    });
-  };
+  // const openMessageBox = async (profile) => {
+  //   return await chrome.tabs.sendMessage(tabDetails.tab.id, {
+  //     message: messages.OPEN_PROFILE,
+  //     profile: profile
+  //   });
+  // };
 
   const extractMessageConnections = async () => {
     const profileNavigateResponse = await chrome.tabs.sendMessage(
@@ -79,28 +80,32 @@ function Connections () {
       width: '350px'
     },
     {
-      name: 'is Read',
+      name: 'Is Read',
       selector: (row) => (
         <span>
-          {row.isRead ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+          {row.isRead ? (
+            <CheckCircleOutlined style={{ color: 'green' }} />
+          ) : (
+            <CloseCircleOutlined style={{ color: 'red' }} />
+          )}
         </span>
       ),
       width: '120px'
     },
     {
       name: 'Time',
-      selector: (row) => row.time,
-      width: '120px'
-    },
-    {
-      name: 'Action',
-      selector: (row) => (
-        <button onClick={() => openMessageBox(row.profile_index)}>
-          Message
-        </button>
-      ),
+      selector: (row) => moment(row.time).format('MMM DD, YYYY'),
       width: '120px'
     }
+    // {
+    //   name: 'Action',
+    //   selector: (row) => (
+    //     <button onClick={() => openMessageBox(row.profile_index)}>
+    //       Message
+    //     </button>
+    //   ),
+    //   width: '120px'
+    // }
   ];
 
   if (msgConnection.length === 0 && !loading) {
