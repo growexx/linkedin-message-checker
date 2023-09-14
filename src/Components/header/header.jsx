@@ -2,10 +2,10 @@
 import React from 'react';
 import classes from './Header.module.css';
 import { useEffect, useState } from 'react';
-import { messages } from '../../utils/enum';
 import Connections from '../connections/connections';
 import UserList from '../connections/UserList';
 import { Card, List, Tabs } from "antd";
+import { messages } from '../../utils/constants';
 
 const { TabPane } = Tabs;
 

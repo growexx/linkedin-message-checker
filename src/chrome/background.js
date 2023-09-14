@@ -21,11 +21,11 @@ chrome.action.onClicked.addListener(async () => {
     chrome.windows.create({
         tabId: tab.id,
         url: 'popup.html',
-        width: 500,
+        width: 1000,
         height: 800,
         type: 'popup',
-        left: 500,
-        top: 30
+        left: 350,
+        top: 130
     });
 
     tabDetails = tab;

@@ -5,8 +5,8 @@
   "manifest_version": 3,
   "author": "Growexx",
   "icons": {
-    "192": "icons/icon-192x192.png",
-    "512": "icons/icon-512x512.png"
+    "192": "icons/192.png",
+    "512": "icons/512.png"
   },
   "background": {
     "service_worker": "background.js"

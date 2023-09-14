@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 /* global chrome*/
 import { numbers } from '../utils/enum';
-import { dateConfig, messageConfig, messages } from '../utils/constants';
+import { conditions, dateConfig, declinedTextArr, messageConfig, messages, searchStringForNotification } from '../utils/constants';
 
 let mapContent = {};
 let scrollHeight;
@@ -192,7 +193,8 @@ const msgScrapeFunction = async (url, csvData) => {
   const msgConnections = {};
   msgDivs.forEach((element, index) => {
     let date = document
-      .querySelectorAll('time.msg-overlay-list-bubble-item__time-stamp')[index].textContent.trim();
+      .querySelectorAll('time.msg-overlay-list-bubble-item__time-stamp')
+      [index].textContent.trim();
     if (isNaN(Date.parse(date))) {
       date = new Date();
     }
@@ -204,7 +206,8 @@ const msgScrapeFunction = async (url, csvData) => {
       name: document
         .querySelectorAll(
           'h3.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names'
-        )[index].textContent.trim(),
+        )
+        [index].textContent.trim(),
       time: date,
       img: document.querySelectorAll(
         'div.msg-selectable-entity.msg-selectable-entity--3 img'
@@ -525,32 +528,75 @@ const isClassVisible = () => {
   return false; // The element with the specified class is not visible
 };
 
-// eslint-disable-next-line consistent-return
+
+// // eslint-disable-next-line consistent-return
+// const scrollMsgConnection = async () => {
+//   const element = document.getElementsByClassName(
+//     'msg-conversations-container__conversations-list'
+//   )[0];
+//   console.log('Element ->', element);
+//   if (element) {
+//     let isScrollFinished = false;
+//     // eslint-disable-next-line no-constant-condition
+//     while (!isScrollFinished) {
+//       const isSpecificClassVisible = isClassVisible();
+//       const isScrollAtEnd =
+//         element.scrollTop >= element.scrollHeight - element.clientHeight;
+//       if (!isSpecificClassVisible && !isScrollAtEnd) {
+//         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
+//         // isScrollFinished = false;
+//       } else if (
+//         (isSpecificClassVisible && isScrollAtEnd) ||
+//         (isSpecificClassVisible && !isScrollAtEnd)
+//       ) {
+//         const result = await loadNextMsgConnection();
+//         if (result) {
+//           isScrollFinished = true;
+//         }
+//       } else if (!isSpecificClassVisible && isScrollAtEnd) {
+//         isScrollFinished = true;
+//         GlobalFlag = false;
+//       }
+//       await delay(1500);
+//     }
+//   }
+// };
 const scrollMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'msg-conversations-container__conversations-list'
   )[0];
   if (element) {
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const isSpecificClassVisible = isClassVisible();
       const isScrollAtEnd =
         element.scrollTop >= element.scrollHeight - element.clientHeight;
+      console.log(
+        'visible---',
+        isSpecificClassVisible,
+        'isScrollAtEnd---',
+        isScrollAtEnd
+      );
       if (!isSpecificClassVisible && !isScrollAtEnd) {
+        console.log('--if---continue scroll');
         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
       } else if (
         (isSpecificClassVisible && isScrollAtEnd) ||
         (isSpecificClassVisible && !isScrollAtEnd)
       ) {
-        const result = await loadNextMsgConnection();
-        if (!result) {
-          return true;
-        } else {
-          return false;
-        }
+        console.log('--else if---continue load');
+        const element = document.getElementsByClassName(
+          'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
+        )[0];
+        element.click();
+      } else {
+        console.log('--else break---');
+        extractMsgConnection();
+        return true;
       }
-      await delay(1500);
+      await delay(500);
     }
+  } else {
+    console.log('Element is not loaded successfully!');
   }
 };
 
@@ -558,27 +604,50 @@ const loadNextMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
   )[0];
+  // if (element) {
+  //   element.click();
+  //   await delay(1000);
+  //   return scrollMsgConnection();
+  // }
   element.click();
   await delay(1000);
   return scrollMsgConnection();
+  // return false;
+};
+
+const filterMessages = (arr) => {
+  const resultArr = Object.values(arr).filter(message => {
+    const msgText = message.msg.toLowerCase();
+    const isExcluded = declinedTextArr.some(word => msgText.includes(word.toLowerCase()));
+    return !isExcluded;
+  });
+  return resultArr;
 };
 
 const extractMsgConnection = async () => {
+  console.log('extractMsgConnection---');
+  // console.log(days, '---', totalResult, '---', option);
   const list = document.querySelectorAll(
     'div.msg-conversation-card__row.msg-conversation-card__title-row'
   );
+  console.log('list', list);
   const msgConnections = {};
+
   list.forEach((element, index) => {
     let date = element
       .querySelector('time.msg-conversation-listitem__time-stamp')
       .textContent.trim();
+
     const name = element
       .querySelector(
         'h3.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names'
       )
       .textContent.trim();
-    const img = document.querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img')
-      ? document.querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img').currentSrc
+    const msg = element.nextElementSibling.innerText;
+    const img = document
+      .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img')
+      ? document
+          .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img').currentSrc
       : '';
     if (isNaN(Date.parse(date))) {
       date = new Date();
@@ -587,15 +656,19 @@ const extractMsgConnection = async () => {
       const currentYear = new Date().getFullYear();
       date = date + ' ' + currentYear;
     }
+    const isRead = !element.nextElementSibling.innerText.includes(searchStringForNotification);
     msgConnections[index] = {
       name: name,
       time: date,
       img: img,
-      profile_index: index
+      profile_index: index,
+      msg: msg,
+      isRead: isRead
     };
   });
-  localStorage.setItem('msgConnections', JSON.stringify({ msgConnections }));
-  return msgConnections;
+  const finalMsgConnections = filterMessages(msgConnections);
+  console.log('msgConnections---', finalMsgConnections);
+  localStorage.setItem('msgConnections', JSON.stringify({ finalMsgConnections }));
 };
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
@@ -663,19 +736,17 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       break;
     }
     case messages.SCROLLMSGCONNECTION: {
-      // eslint-disable-next-line no-unused-vars
-      const response = await scrollMsgConnection(request);
-      sendResponse({ status: 'OK' });
-      return true;
+      await scrollMsgConnection();
+      break;
+    }
+    case messages.EXTRACTMSGCONNECTION: {
+      const data = JSON.parse(localStorage.getItem('msgConnections'));
+      sendResponse({ data: data });
+      break;
     }
     case messages.LOADMOREMSGCONNECTION: {
       loadNextMsgConnection(request);
       sendResponse({ status: 'OK' });
-      return true;
-    }
-    case messages.EXTRACTMSGCONNECTION: {
-      const data = extractMsgConnection(request);
-      sendResponse({ data: data });
       return true;
     }
     default:

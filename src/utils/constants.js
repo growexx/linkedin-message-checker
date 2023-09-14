@@ -1,6 +1,5 @@
 export const LINKDIN_MSG_URL = 'https://www.linkedin.com/messaging';
 
-
 export const messages = {
   WITH_CHATGPT: 'withChatGPT',
   WITHOUT_CHATGPT: 'withoutChatGPT',
@@ -50,3 +49,30 @@ export const columnsName = {
 export const dateConfig = {
   PAST_DAYS: 30
 };
+
+export const conditions = {
+  CURRENT_USER_YOU_CONDITION: 'You:'
+};
+
+export const declinedTextArr = [
+  'You:',
+  'Thank you',
+  'Ok',
+  'ok',
+  'Okay',
+  'Happy Birthday!',
+  'Happy Birthday',
+  'You sent a post',
+  'You sent an attachment',
+  'Thanks',
+  'No problem',
+  'Any time',
+  'No worries',
+  'form',
+  'You\'re welcome',
+  'Sponsored',
+  'Thanks for letting me know'
+];
+
+export const searchStringForNotification = 'new notification';
+

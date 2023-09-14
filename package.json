@@ -11,12 +11,14 @@
     "build": "webpack --config webpack.prod.js"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "antd": "^5.8.3",
     "core-js": "^3.30.2",
     "export-from-json": "^1.7.2",
     "openai": "3.3.0",
     "papaparse": "^5.4.1",
     "react": "^18.2.0",
+    "react-data-table-component": "^7.5.4",
     "react-dom": "^18.2.0",
     "regenerator-runtime": "^0.13.11",
     "style-loader": "^3.3.1",
