@@ -23,12 +23,12 @@ function Connections () {
   }, []);
   // const defaultImageSrc = 'img/default-user-image.png';
 
-  // const openMessageBox = async (profile) => {
-  //   return await chrome.tabs.sendMessage(tabDetails.tab.id, {
-  //     message: messages.OPEN_PROFILE,
-  //     profile: profile
-  //   });
-  // };
+  const openMessageBox = async (profile) => {
+    return await chrome.tabs.sendMessage(tabDetails.tab.id, {
+      message: messages.OPEN_PROFILE,
+      profile: profile
+    });
+  };
 
   const extractMessageConnections = async () => {
     const profileNavigateResponse = await chrome.tabs.sendMessage(
@@ -96,16 +96,16 @@ function Connections () {
       name: 'Time',
       selector: (row) => moment(row.time).format('MMM DD, YYYY'),
       width: '120px'
+    },
+    {
+      name: 'Action',
+      selector: (row) => (
+        <button onClick={() => openMessageBox(row.profile_index)}>
+          Message
+        </button>
+      ),
+      width: '120px'
     }
-    // {
-    //   name: 'Action',
-    //   selector: (row) => (
-    //     <button onClick={() => openMessageBox(row.profile_index)}>
-    //       Message
-    //     </button>
-    //   ),
-    //   width: '120px'
-    // }
   ];
 
   if (msgConnection.length === 0 && !loading) {

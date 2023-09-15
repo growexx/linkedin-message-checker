@@ -25,7 +25,7 @@ chrome.action.onClicked.addListener(async () => {
         height: 800,
         type: 'popup',
         left: 350,
-        top: 130
+        top: 100
     });
 
     tabDetails = tab;
