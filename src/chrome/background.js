@@ -1,6 +1,6 @@
+import { backgroundMessages } from '../utils/constants';
 
 /* global chrome */
-import { backgroundMessages } from '../utils/enum';
 let tabDetails = {};
 
 // ON installation Event

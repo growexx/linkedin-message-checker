@@ -1,7 +1,7 @@
+/* eslint-disable consistent-return */
 /* eslint-disable max-len */
 /* global chrome*/
-import { numbers } from '../utils/enum';
-import { conditions, dateConfig, declinedTextArr, messageConfig, messages, searchStringForNotification } from '../utils/constants';
+import { dateConfig, declinedTextArr, messageConfig, messages, numbers, searchStringForNotification } from '../utils/constants';
 
 let mapContent = {};
 let scrollHeight;
@@ -566,37 +566,29 @@ const scrollMsgConnection = async () => {
     'msg-conversations-container__conversations-list'
   )[0];
   if (element) {
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const isSpecificClassVisible = isClassVisible();
       const isScrollAtEnd =
         element.scrollTop >= element.scrollHeight - element.clientHeight;
-      console.log(
-        'visible---',
-        isSpecificClassVisible,
-        'isScrollAtEnd---',
-        isScrollAtEnd
-      );
       if (!isSpecificClassVisible && !isScrollAtEnd) {
-        console.log('--if---continue scroll');
         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
       } else if (
         (isSpecificClassVisible && isScrollAtEnd) ||
         (isSpecificClassVisible && !isScrollAtEnd)
       ) {
-        console.log('--else if---continue load');
         const element = document.getElementsByClassName(
           'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
         )[0];
         element.click();
       } else {
-        console.log('--else break---');
         extractMsgConnection();
         return true;
       }
       await delay(500);
     }
   } else {
-    console.log('Element is not loaded successfully!');
+    console.error('Element is not loaded successfully!');
   }
 };
 
@@ -604,15 +596,9 @@ const loadNextMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
   )[0];
-  // if (element) {
-  //   element.click();
-  //   await delay(1000);
-  //   return scrollMsgConnection();
-  // }
   element.click();
   await delay(1000);
   return scrollMsgConnection();
-  // return false;
 };
 
 const filterMessages = (arr) => {
@@ -625,12 +611,9 @@ const filterMessages = (arr) => {
 };
 
 const extractMsgConnection = async () => {
-  console.log('extractMsgConnection---');
-  // console.log(days, '---', totalResult, '---', option);
   const list = document.querySelectorAll(
     'div.msg-conversation-card__row.msg-conversation-card__title-row'
   );
-  console.log('list', list);
   const msgConnections = {};
 
   list.forEach((element, index) => {
@@ -667,7 +650,6 @@ const extractMsgConnection = async () => {
     };
   });
   const finalMsgConnections = filterMessages(msgConnections);
-  console.log('msgConnections---', finalMsgConnections);
   localStorage.setItem('msgConnections', JSON.stringify({ finalMsgConnections }));
 };
 

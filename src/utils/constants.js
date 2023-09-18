@@ -76,3 +76,21 @@ export const declinedTextArr = [
 
 export const searchStringForNotification = 'new notification';
 
+export const backgroundMessages = {
+  INSTALL: 'install',
+  TABDETAILS: 'tabDetails'
+};
+
+export const numbers = {
+  ONE_THOUSAND: 1000,
+  TWO_THOUSAND: 2000,
+  FIVE_THOUSAND: 5000,
+  SEVEN_THOUSAND: 7000,
+  TEN_THOUSAND: 10000,
+  ZERO: 0,
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+  FIVE: 5,
+  FIFTY: 50
+};
