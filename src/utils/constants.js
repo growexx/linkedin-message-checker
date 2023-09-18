@@ -71,7 +71,10 @@ export const declinedTextArr = [
   'form',
   'You\'re welcome',
   'Sponsored',
-  'Thanks for letting me know'
+  'Thanks for letting me know',
+  'Fine',
+  'Happy Anniversary',
+  'Happy Marriage Anniversary'
 ];
 
 export const searchStringForNotification = 'new notification';

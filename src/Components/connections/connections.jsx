@@ -2,15 +2,18 @@
 /* eslint-disable consistent-return */
 import React, { useState, useEffect } from 'react';
 import { LINKDIN_MSG_URL, messages } from '../../utils/constants';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined } from '@ant-design/icons';
 import DataTable from 'react-data-table-component';
 import moment from 'moment';
+import { Button } from 'antd';
+import './connection.css';
 
 function Connections () {
   const [tabDetails, setTabDetails] = useState({});
   // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
   const [msgConnection, setMsgConnection] = useState([]);
+  const [countData, setCountData] = useState({});
   const getTabDetails = async () => {
     const res = await chrome.runtime.sendMessage({
       message: messages.TAB_DETAILS
@@ -53,6 +56,7 @@ function Connections () {
       );
       if (extractMsgConnection) {
         setMsgConnection(extractMsgConnection.data.finalMsgConnections);
+        setCountData(extractMsgConnection.countData);
         setLoading(false);
       }
     }
@@ -67,41 +71,63 @@ function Connections () {
     return value.includes(':') ? value.split(':')[1] : value;
   };
 
+  const customSort = (rows, selector, direction) => {
+    return rows.sort((rowA, rowB) => {
+      // use the selector function to resolve your field names by passing the sort comparitors
+      const aField = selector(rowA);
+      const bField = selector(rowB);
+
+      let comparison = 0;
+
+      if (aField > bField) {
+        comparison = 1;
+      } else if (aField < bField) {
+        comparison = -1;
+      }
+
+      return direction === 'desc' ? comparison * -1 : comparison;
+    });
+  };
+
   const msgConnectionTableColumns = [
     {
       name: 'Name',
       selector: (row) => row.name,
-      width: '160px'
+      width: '160px',
+      sortable: true
     },
     {
       name: 'Last Message',
       selector: (row) => <span>{convertMsg(row.msg)}</span>,
-      width: '350px'
+      width: '350px',
+      sortable: true
     },
     {
-      name: 'Is Read',
+      name: 'Read',
       selector: (row) => (
         <span>
           {row.isRead ? (
             <CheckCircleOutlined style={{ color: 'green' }} />
           ) : (
-            <CloseCircleOutlined style={{ color: 'red' }} />
+            '-'
           )}
         </span>
       ),
-      width: '120px'
+      width: '120px',
+      sortable: true
     },
     {
-      name: 'Time',
+      name: 'Date & Time',
       selector: (row) => moment(row.time).format('MMM DD, YYYY'),
-      width: '120px'
+      width: '160px',
+      sortable: true
     },
     {
       name: 'Action',
       selector: (row) => (
-        <button onClick={() => openMessageBox(row.msgLink)}>
+        <Button size="small" onClick={() => openMessageBox(row.msgLink)}>
           Message
-        </button>
+        </Button>
       ),
       width: '120px'
     }
@@ -111,18 +137,63 @@ function Connections () {
     return (
       <div>
         <div>
-          <button onClick={extractFromPageRange}>Scrape Data</button>
+          <Button onClick={extractFromPageRange}>Scrape Data</Button>
         </div>
       </div>
     );
   } else if (msgConnection.length > 0 && !loading) {
     return (
-      <div>
+      <div id="root">
+        <div className="container pt-5">
+          <div className="row align-items-stretch box">
+            <div className="c-dashboardInfo col-lg-3 col-md-6">
+              <div className="wrap">
+                <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
+                  Scrapped Messages
+                </h4>
+                <span className="hind-font caption-12 c-dashboardInfo__count">
+                  {countData?.totalMsgCount}
+                </span>
+              </div>
+            </div>
+            <div className="c-dashboardInfo col-lg-3 col-md-6">
+              <div className="wrap">
+                <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
+                  Filtered Messages
+                </h4>
+                <span className="hind-font caption-12 c-dashboardInfo__count">
+                  {countData?.finalMsgCount}
+                </span>
+              </div>
+            </div>
+            <div className="c-dashboardInfo col-lg-3 col-md-6">
+              <div className="wrap">
+                <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
+                  Unread
+                </h4>
+                <span className="hind-font caption-12 c-dashboardInfo__count">
+                  {countData?.falseCount}
+                </span>
+              </div>
+            </div>
+            <div className="c-dashboardInfo col-lg-3 col-md-6">
+              <div className="wrap">
+                <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
+                  Read
+                </h4>
+                <span className="hind-font caption-12 c-dashboardInfo__count">
+                  {countData?.trueCount}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
         <DataTable
           columns={msgConnectionTableColumns}
           data={msgConnection}
           responsive
           pagination
+          sortFunction={customSort}
         />
       </div>
     );

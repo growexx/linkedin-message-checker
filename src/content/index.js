@@ -1,7 +1,14 @@
 /* eslint-disable consistent-return */
 /* eslint-disable max-len */
 /* global chrome*/
-import { dateConfig, declinedTextArr, messageConfig, messages, numbers, searchStringForNotification } from '../utils/constants';
+import {
+  dateConfig,
+  declinedTextArr,
+  messageConfig,
+  messages,
+  numbers,
+  searchStringForNotification
+} from '../utils/constants';
 
 let mapContent = {};
 let scrollHeight;
@@ -569,9 +576,11 @@ const loadNextMsgConnection = async () => {
 };
 
 const filterMessages = (arr) => {
-  const resultArr = Object.values(arr).filter(message => {
+  const resultArr = Object.values(arr).filter((message) => {
     const msgText = message.msg.toLowerCase();
-    const isExcluded = declinedTextArr.some(word => msgText.includes(word.toLowerCase()));
+    const isExcluded = declinedTextArr.some((word) =>
+      msgText.includes(word.toLowerCase())
+    );
     return !isExcluded;
   });
   return resultArr;
@@ -587,18 +596,21 @@ const extractMsgConnection = async () => {
     let date = element
       .querySelector('time.msg-conversation-listitem__time-stamp')
       .textContent.trim();
-
     const name = element
       .querySelector(
         'h3.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names'
       )
       .textContent.trim();
     const msg = element.nextElementSibling.innerText;
-    const msgLink = document.querySelectorAll('.msg-conversation-card > a')[index].href;
+    const msgLink = document.querySelectorAll('.msg-conversation-card > a')[
+      index
+    ].href;
     const img = document
-      .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img')
+      .querySelectorAll('div.msg-selectable-entity--4')
+      [index].querySelector('div > img')
       ? document
-          .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img').currentSrc
+          .querySelectorAll('div.msg-selectable-entity--4')
+          [index].querySelector('div > img').currentSrc
       : '';
     if (isNaN(Date.parse(date))) {
       date = new Date();
@@ -607,7 +619,9 @@ const extractMsgConnection = async () => {
       const currentYear = new Date().getFullYear();
       date = date + ' ' + currentYear;
     }
-    const isRead = !element.nextElementSibling.innerText.includes(searchStringForNotification);
+    const isRead = !element.nextElementSibling.innerText.includes(
+      searchStringForNotification
+    );
     msgConnections[index] = {
       name: name,
       time: date,
@@ -618,8 +632,32 @@ const extractMsgConnection = async () => {
       msgLink: msgLink
     };
   });
+  const totalMsgCount = Object.entries(msgConnections).length;
+  console.log('total Msg count', totalMsgCount);
   const finalMsgConnections = filterMessages(msgConnections);
-  localStorage.setItem('msgConnections', JSON.stringify({ finalMsgConnections }));
+  const finalMsgCount = Object.entries(finalMsgConnections).length;
+  console.log('final Msg count', finalMsgCount);
+  let trueCount = 0;
+  let falseCount = 0;
+  finalMsgConnections.forEach((message) => {
+    if (message.isRead) {
+      trueCount++;
+    } else {
+      falseCount++;
+    }
+  });
+  console.log('true count', trueCount);
+  console.log('false count', falseCount);
+  localStorage.setItem(
+    'msgConnections',
+    JSON.stringify({ finalMsgConnections })
+  );
+  localStorage.setItem('counts', JSON.stringify({
+    totalMsgCount,
+    finalMsgCount,
+    trueCount,
+    falseCount
+  }));
 };
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
@@ -692,7 +730,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     }
     case messages.EXTRACTMSGCONNECTION: {
       const data = JSON.parse(localStorage.getItem('msgConnections'));
-      sendResponse({ data: data });
+      const countData = JSON.parse(localStorage.getItem('counts'));
+      sendResponse({ data: data, countData: countData });
       break;
     }
     case messages.LOADMOREMSGCONNECTION: {
