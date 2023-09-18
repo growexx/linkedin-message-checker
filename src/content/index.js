@@ -528,39 +528,6 @@ const isClassVisible = () => {
   return false; // The element with the specified class is not visible
 };
 
-
-// // eslint-disable-next-line consistent-return
-// const scrollMsgConnection = async () => {
-//   const element = document.getElementsByClassName(
-//     'msg-conversations-container__conversations-list'
-//   )[0];
-//   console.log('Element ->', element);
-//   if (element) {
-//     let isScrollFinished = false;
-//     // eslint-disable-next-line no-constant-condition
-//     while (!isScrollFinished) {
-//       const isSpecificClassVisible = isClassVisible();
-//       const isScrollAtEnd =
-//         element.scrollTop >= element.scrollHeight - element.clientHeight;
-//       if (!isSpecificClassVisible && !isScrollAtEnd) {
-//         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
-//         // isScrollFinished = false;
-//       } else if (
-//         (isSpecificClassVisible && isScrollAtEnd) ||
-//         (isSpecificClassVisible && !isScrollAtEnd)
-//       ) {
-//         const result = await loadNextMsgConnection();
-//         if (result) {
-//           isScrollFinished = true;
-//         }
-//       } else if (!isSpecificClassVisible && isScrollAtEnd) {
-//         isScrollFinished = true;
-//         GlobalFlag = false;
-//       }
-//       await delay(1500);
-//     }
-//   }
-// };
 const scrollMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'msg-conversations-container__conversations-list'
@@ -627,6 +594,7 @@ const extractMsgConnection = async () => {
       )
       .textContent.trim();
     const msg = element.nextElementSibling.innerText;
+    const msgLink = document.querySelectorAll('.msg-conversation-card > a')[index].href;
     const img = document
       .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img')
       ? document
@@ -646,7 +614,8 @@ const extractMsgConnection = async () => {
       img: img,
       profile_index: index,
       msg: msg,
-      isRead: isRead
+      isRead: isRead,
+      msgLink: msgLink
     };
   });
   const finalMsgConnections = filterMessages(msgConnections);
