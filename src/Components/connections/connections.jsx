@@ -7,6 +7,7 @@ import DataTable from 'react-data-table-component';
 import moment from 'moment';
 import { Button } from 'antd';
 import './connection.css';
+import { orderBy } from 'lodash';
 
 function Connections () {
   const [tabDetails, setTabDetails] = useState({});
@@ -14,6 +15,7 @@ function Connections () {
   const [loading, setLoading] = useState(false);
   const [msgConnection, setMsgConnection] = useState([]);
   const [countData, setCountData] = useState({});
+  const [sortKey, setSortKey] = useState(null);
   const getTabDetails = async () => {
     const res = await chrome.runtime.sendMessage({
       message: messages.TAB_DETAILS
@@ -62,6 +64,27 @@ function Connections () {
     }
   };
 
+  const customSort = (rows, selector, direction) => {
+    if (sortKey === 'date') {
+      return rows.sort((rowA, rowB) => {
+        const aDate = new Date(selector(rowA));
+        const bDate = new Date(selector(rowB));
+        let comparison = 0;
+        if (aDate > bDate) {
+          comparison = 1;
+        } else if (aDate < bDate) {
+          comparison = -1;
+        }
+        return direction === 'desc' ? comparison * -1 : comparison;
+      });
+    }
+    return orderBy(rows, selector, direction);
+  };
+
+  const handleSortKey = (key) => {
+    setSortKey(key.id);
+  };
+
   const extractFromPageRange = async () => {
     setLoading(true);
     await extractMessageConnections();
@@ -71,40 +94,27 @@ function Connections () {
     return value.includes(':') ? value.split(':')[1] : value;
   };
 
-  const customSort = (rows, selector, direction) => {
-    return rows.sort((rowA, rowB) => {
-      // use the selector function to resolve your field names by passing the sort comparitors
-      const aField = selector(rowA);
-      const bField = selector(rowB);
-
-      let comparison = 0;
-
-      if (aField > bField) {
-        comparison = 1;
-      } else if (aField < bField) {
-        comparison = -1;
-      }
-
-      return direction === 'desc' ? comparison * -1 : comparison;
-    });
-  };
-
   const msgConnectionTableColumns = [
     {
       name: 'Name',
+      id: 'name',
       selector: (row) => row.name,
       width: '160px',
       sortable: true
     },
     {
       name: 'Last Message',
-      selector: (row) => <span>{convertMsg(row.msg)}</span>,
+      id: 'lastMsg',
+      selector: (row) => row.msg,
+      format: (row) => <span>{convertMsg(row.msg)}</span>,
       width: '350px',
       sortable: true
     },
     {
       name: 'Read',
-      selector: (row) => (
+      id: 'read',
+      selector: (row) => row.isRead,
+      format: (row) => (
         <span>
           {row.isRead ? (
             <CheckCircleOutlined style={{ color: 'green' }} />
@@ -117,8 +127,10 @@ function Connections () {
       sortable: true
     },
     {
-      name: 'Date & Time',
-      selector: (row) => moment(row.time).format('MMM DD, YYYY'),
+      name: 'Date',
+      id: 'date',
+      selector: (row) => row.time,
+      format: (row) => moment(row.time).format('MMM DD, YYYY'),
       width: '160px',
       sortable: true
     },
@@ -169,7 +181,7 @@ function Connections () {
             <div className="c-dashboardInfo col-lg-3 col-md-6">
               <div className="wrap">
                 <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
-                  Unread
+                  Unread Messages
                 </h4>
                 <span className="hind-font caption-12 c-dashboardInfo__count">
                   {countData?.falseCount}
@@ -179,7 +191,7 @@ function Connections () {
             <div className="c-dashboardInfo col-lg-3 col-md-6">
               <div className="wrap">
                 <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
-                  Read
+                  Read Messages
                 </h4>
                 <span className="hind-font caption-12 c-dashboardInfo__count">
                   {countData?.trueCount}
@@ -194,6 +206,7 @@ function Connections () {
           responsive
           pagination
           sortFunction={customSort}
+          onSort={handleSortKey}
         />
       </div>
     );

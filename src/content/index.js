@@ -633,10 +633,8 @@ const extractMsgConnection = async () => {
     };
   });
   const totalMsgCount = Object.entries(msgConnections).length;
-  console.log('total Msg count', totalMsgCount);
   const finalMsgConnections = filterMessages(msgConnections);
   const finalMsgCount = Object.entries(finalMsgConnections).length;
-  console.log('final Msg count', finalMsgCount);
   let trueCount = 0;
   let falseCount = 0;
   finalMsgConnections.forEach((message) => {
@@ -646,8 +644,6 @@ const extractMsgConnection = async () => {
       falseCount++;
     }
   });
-  console.log('true count', trueCount);
-  console.log('false count', falseCount);
   localStorage.setItem(
     'msgConnections',
     JSON.stringify({ finalMsgConnections })

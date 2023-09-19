@@ -15,6 +15,7 @@
     "antd": "^5.8.3",
     "core-js": "^3.30.2",
     "export-from-json": "^1.7.2",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "openai": "3.3.0",
     "papaparse": "^5.4.1",
