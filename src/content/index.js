@@ -534,7 +534,6 @@ const isClassVisible = () => {
   }
   return false; // The element with the specified class is not visible
 };
-
 const scrollMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'msg-conversations-container__conversations-list'
@@ -648,12 +647,15 @@ const extractMsgConnection = async () => {
     'msgConnections',
     JSON.stringify({ finalMsgConnections })
   );
-  localStorage.setItem('counts', JSON.stringify({
-    totalMsgCount,
-    finalMsgCount,
-    trueCount,
-    falseCount
-  }));
+  localStorage.setItem(
+    'counts',
+    JSON.stringify({
+      totalMsgCount,
+      finalMsgCount,
+      trueCount,
+      falseCount
+    })
+  );
 };
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {

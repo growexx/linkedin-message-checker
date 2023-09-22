@@ -171,7 +171,7 @@ function Connections () {
             <div className="c-dashboardInfo col-lg-3 col-md-6">
               <div className="wrap">
                 <h4 className="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">
-                  Filtered Messages
+                  Not Replied Messages
                 </h4>
                 <span className="hind-font caption-12 c-dashboardInfo__count">
                   {countData?.finalMsgCount}
