@@ -4,6 +4,7 @@
 import {
   dateConfig,
   declinedTextArr,
+  endNumber,
   messageConfig,
   messages,
   numbers,
@@ -534,30 +535,47 @@ const isClassVisible = () => {
   }
   return false; // The element with the specified class is not visible
 };
+
 const scrollMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'msg-conversations-container__conversations-list'
   )[0];
+  let index = 0;
+  let count = 0;
+  const root =
+    'div.msg-conversation-card__row.msg-conversation-card__title-row';
   if (element) {
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      const output = declinedTextArr.some((word) =>
+        document
+          .querySelectorAll(root)[index].nextElementSibling.innerText.toLowerCase()
+          .includes(word.toLowerCase())
+      );
+      if (output === false) {
+        count = count + 1;
+      }
       const isSpecificClassVisible = isClassVisible();
       const isScrollAtEnd =
         element.scrollTop >= element.scrollHeight - element.clientHeight;
-      if (!isSpecificClassVisible && !isScrollAtEnd) {
+      if (!isSpecificClassVisible && !isScrollAtEnd && count !== endNumber) {
         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
       } else if (
         (isSpecificClassVisible && isScrollAtEnd) ||
-        (isSpecificClassVisible && !isScrollAtEnd)
+        (isSpecificClassVisible && !isScrollAtEnd && count !== endNumber)
       ) {
         const element = document.getElementsByClassName(
           'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
         )[0];
         element.click();
+      } else if (count === endNumber) {
+        extractMsgConnection();
+        return true;
       } else {
         extractMsgConnection();
         return true;
       }
+      index++;
       await delay(500);
     }
   } else {

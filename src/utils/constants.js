@@ -54,6 +54,8 @@ export const conditions = {
   CURRENT_USER_YOU_CONDITION: 'You:'
 };
 
+export const endNumber = 100;
+
 export const declinedTextArr = [
   'You:',
   // 'Thank you',

@@ -41,6 +41,12 @@ The extension allows you to navigate through pages on LinkedIn and handle pagina
 4. Extracting User-Selected Data Points
 This function extracts specific data points from a list of elements on a webpage.
 
+5. End Number
+End number is where you want to stop your loop and it is in constant files
+
+6.Filteration
+Filter the common words - Happy Anniversary, Happy Work Anniversary
+
 How it Works
 The extension uses JavaScript and Chrome's extension APIs to interact with the LinkedIn website. It leverages DOM manipulation to extract and process data from various elements on the page.
 

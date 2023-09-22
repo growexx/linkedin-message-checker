@@ -5,7 +5,7 @@ import { LINKDIN_MSG_URL, messages } from '../../utils/constants';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import DataTable from 'react-data-table-component';
 import moment from 'moment';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import './connection.css';
 import { orderBy } from 'lodash';
 
@@ -25,7 +25,6 @@ function Connections () {
   useEffect(() => {
     getTabDetails();
   }, []);
-  // const defaultImageSrc = 'img/default-user-image.png';
 
   const openMessageBox = async (profile) => {
     return await chrome.tabs.sendMessage(tabDetails.tab.id, {
@@ -35,32 +34,37 @@ function Connections () {
   };
 
   const extractMessageConnections = async () => {
-    const profileNavigateResponse = await chrome.tabs.sendMessage(
-      tabDetails.tab.id,
-      {
-        message: messages.OPEN_PROFILE,
-        url: LINKDIN_MSG_URL
-      }
-    );
-
-    if (profileNavigateResponse.status === 'OK') {
-      await new Promise((resolve) => setTimeout(resolve, 7000));
-      // eslint-disable-next-line no-unused-vars
-      const scrollResponse = await chrome.tabs.sendMessage(tabDetails.tab.id, {
-        message: messages.SCROLLMSGCONNECTION
-      });
-      await new Promise((resolve) => setTimeout(resolve, 30000));
-      const extractMsgConnection = await chrome.tabs.sendMessage(
+    try {
+      const profileNavigateResponse = await chrome.tabs.sendMessage(
         tabDetails.tab.id,
         {
-          message: messages.EXTRACTMSGCONNECTION
+          message: messages.OPEN_PROFILE,
+          url: LINKDIN_MSG_URL
         }
       );
-      if (extractMsgConnection) {
-        setMsgConnection(extractMsgConnection.data.finalMsgConnections);
-        setCountData(extractMsgConnection.countData);
-        setLoading(false);
+      if (profileNavigateResponse.status === 'OK') {
+        await new Promise((resolve) => setTimeout(resolve, 7000));
+        // eslint-disable-next-line no-unused-vars
+        const scrollResponse = await chrome.tabs.sendMessage(tabDetails.tab.id, {
+          message: messages.SCROLLMSGCONNECTION
+        });
+        await new Promise((resolve) => setTimeout(resolve, 30000));
+        const extractMsgConnection = await chrome.tabs.sendMessage(
+          tabDetails.tab.id,
+          {
+            message: messages.EXTRACTMSGCONNECTION
+          }
+        );
+        if (extractMsgConnection) {
+          setMsgConnection(extractMsgConnection.data.finalMsgConnections);
+          setCountData(extractMsgConnection.countData);
+          setLoading(false);
+        }
       }
+    } catch (error) {
+      setLoading(false);
+      setMsgConnection([]);
+      message.error(error.message);
     }
   };
 
