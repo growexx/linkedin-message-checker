@@ -29,7 +29,8 @@ export const messages = {
   EXTRACTPAGENUMBER: 'extractPageNumber',
   SCROLLMSGCONNECTION: 'scrollMsgConnection',
   LOADMOREMSGCONNECTION: 'loadMoreMsgConnection',
-  EXTRACTMSGCONNECTION: 'extractMsgConnection'
+  EXTRACTMSGCONNECTION: 'extractMsgConnection',
+  REMOVE_EXISTING_DATA: 'removeExistingData'
 };
 
 export const messageConfig = {

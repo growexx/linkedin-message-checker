@@ -48,7 +48,7 @@ function Connections () {
         const scrollResponse = await chrome.tabs.sendMessage(tabDetails.tab.id, {
           message: messages.SCROLLMSGCONNECTION
         });
-        await new Promise((resolve) => setTimeout(resolve, 30000));
+        await new Promise((resolve) => setTimeout(resolve, 70000));
         const extractMsgConnection = await chrome.tabs.sendMessage(
           tabDetails.tab.id,
           {
@@ -90,6 +90,9 @@ function Connections () {
   };
 
   const extractFromPageRange = async () => {
+    chrome.tabs.sendMessage(tabDetails.tab.id, {
+      message: messages.REMOVE_EXISTING_DATA
+    });
     setLoading(true);
     await extractMessageConnections();
   };
