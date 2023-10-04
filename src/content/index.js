@@ -1,7 +1,15 @@
 /* eslint-disable consistent-return */
 /* eslint-disable max-len */
 /* global chrome*/
-import { dateConfig, declinedTextArr, messageConfig, messages, numbers, searchStringForNotification } from '../utils/constants';
+import {
+  dateConfig,
+  declinedTextArr,
+  endNumber,
+  messageConfig,
+  messages,
+  numbers,
+  searchStringForNotification
+} from '../utils/constants';
 
 let mapContent = {};
 let scrollHeight;
@@ -528,64 +536,57 @@ const isClassVisible = () => {
   return false; // The element with the specified class is not visible
 };
 
-
-// // eslint-disable-next-line consistent-return
-// const scrollMsgConnection = async () => {
-//   const element = document.getElementsByClassName(
-//     'msg-conversations-container__conversations-list'
-//   )[0];
-//   console.log('Element ->', element);
-//   if (element) {
-//     let isScrollFinished = false;
-//     // eslint-disable-next-line no-constant-condition
-//     while (!isScrollFinished) {
-//       const isSpecificClassVisible = isClassVisible();
-//       const isScrollAtEnd =
-//         element.scrollTop >= element.scrollHeight - element.clientHeight;
-//       if (!isSpecificClassVisible && !isScrollAtEnd) {
-//         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
-//         // isScrollFinished = false;
-//       } else if (
-//         (isSpecificClassVisible && isScrollAtEnd) ||
-//         (isSpecificClassVisible && !isScrollAtEnd)
-//       ) {
-//         const result = await loadNextMsgConnection();
-//         if (result) {
-//           isScrollFinished = true;
-//         }
-//       } else if (!isSpecificClassVisible && isScrollAtEnd) {
-//         isScrollFinished = true;
-//         GlobalFlag = false;
-//       }
-//       await delay(1500);
-//     }
-//   }
-// };
 const scrollMsgConnection = async () => {
   const element = document.getElementsByClassName(
     'msg-conversations-container__conversations-list'
   )[0];
+  let index = 0;
+  let count = 0;
+  let filteredMsg = {};
   if (element) {
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      const name = element.getElementsByClassName('msg-conversation-listitem__participant-names msg-conversation-card__participant-names')[index].innerText;
+      let date = element.getElementsByClassName('msg-conversation-listitem__time-stamp')[index].innerText;
+      const msgNode = element.getElementsByClassName('msg-conversation-card__row msg-conversation-card__body-row')[index].innerText;
+      const isRead = !msgNode.includes(searchStringForNotification);
+      const msgLink = element.getElementsByClassName('msg-conversation-listitem__link msg-conversations-container__convo-item-link')[index].getAttribute('href');
+      const output = declinedTextArr.some((word) => msgNode.toLowerCase().includes(word.toLowerCase()));
+      if (isNaN(Date.parse(date))) {
+        date = new Date();
+      }
+      if (!/\d{4}/.test(date)) {
+        const currentYear = new Date().getFullYear();
+        date = date + ' ' + currentYear;
+      }
+      if (output === false) {
+        count = count + 1;
+        filteredMsg[count] = {
+          name: name,
+          time: date,
+          msg: msgNode,
+          isRead: isRead,
+          msgLink: msgLink
+        };
+      }
       const isSpecificClassVisible = isClassVisible();
       const isScrollAtEnd =
         element.scrollTop >= element.scrollHeight - element.clientHeight;
-      if (!isSpecificClassVisible && !isScrollAtEnd) {
+      if (!isSpecificClassVisible && !isScrollAtEnd && count <= endNumber) {
         element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
       } else if (
-        (isSpecificClassVisible && isScrollAtEnd) ||
-        (isSpecificClassVisible && !isScrollAtEnd)
-      ) {
-        const element = document.getElementsByClassName(
-          'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
-        )[0];
-        element.click();
+        ((isSpecificClassVisible && isScrollAtEnd) ||
+        (isSpecificClassVisible && !isScrollAtEnd)) && count <= endNumber) {
+          const element = document.getElementsByClassName(
+            'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
+          )[0];
+          element.click();
       } else {
-        extractMsgConnection();
+        extractMsgConnection(filteredMsg);
         return true;
       }
-      await delay(500);
+      index++;
+      await delay(180);
     }
   } else {
     console.error('Element is not loaded successfully!');
@@ -602,15 +603,17 @@ const loadNextMsgConnection = async () => {
 };
 
 const filterMessages = (arr) => {
-  const resultArr = Object.values(arr).filter(message => {
+  const resultArr = Object.values(arr).filter((message) => {
     const msgText = message.msg.toLowerCase();
-    const isExcluded = declinedTextArr.some(word => msgText.includes(word.toLowerCase()));
+    const isExcluded = declinedTextArr.some((word) =>
+      msgText.includes(word.toLowerCase())
+    );
     return !isExcluded;
   });
   return resultArr;
 };
 
-const extractMsgConnection = async () => {
+const extractMsgConnection = async (filteredMsg) => {
   const list = document.querySelectorAll(
     'div.msg-conversation-card__row.msg-conversation-card__title-row'
   );
@@ -620,17 +623,21 @@ const extractMsgConnection = async () => {
     let date = element
       .querySelector('time.msg-conversation-listitem__time-stamp')
       .textContent.trim();
-
     const name = element
       .querySelector(
         'h3.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names'
       )
       .textContent.trim();
     const msg = element.nextElementSibling.innerText;
+    const msgLink = document.querySelectorAll('.msg-conversation-card > a')[
+      index
+    ].href;
     const img = document
-      .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img')
+      .querySelectorAll('div.msg-selectable-entity--4')
+      [index].querySelector('div > img')
       ? document
-          .querySelectorAll('div.msg-selectable-entity--4')[index].querySelector('div > img').currentSrc
+          .querySelectorAll('div.msg-selectable-entity--4')
+          [index].querySelector('div > img').currentSrc
       : '';
     if (isNaN(Date.parse(date))) {
       date = new Date();
@@ -639,18 +646,48 @@ const extractMsgConnection = async () => {
       const currentYear = new Date().getFullYear();
       date = date + ' ' + currentYear;
     }
-    const isRead = !element.nextElementSibling.innerText.includes(searchStringForNotification);
+    const isRead = !element.nextElementSibling.innerText.includes(
+      searchStringForNotification
+    );
     msgConnections[index] = {
       name: name,
       time: date,
       img: img,
       profile_index: index,
       msg: msg,
-      isRead: isRead
+      isRead: isRead,
+      msgLink: msgLink
     };
   });
-  const finalMsgConnections = filterMessages(msgConnections);
-  localStorage.setItem('msgConnections', JSON.stringify({ finalMsgConnections }));
+
+  const messagesArray = Object.values(filteredMsg);
+  const finalRecord = messagesArray.slice(0, endNumber);
+  const totalMsgCount = Object.entries(msgConnections).length;
+  const finalMsgConnections = filterMessages(finalRecord);
+  const finalMsgCount = Object.entries(finalMsgConnections).length;
+  let trueCount = 0;
+  let falseCount = 0;
+  finalMsgConnections.forEach((message) => {
+    if (message.isRead) {
+      trueCount++;
+    } else {
+      falseCount++;
+    }
+  });
+  localStorage.setItem(
+    'msgConnections',
+    JSON.stringify({ finalMsgConnections })
+  );
+  localStorage.setItem(
+    'counts',
+    JSON.stringify({
+      totalMsgCount,
+      finalMsgCount,
+      trueCount,
+      falseCount
+    })
+  );
+  localStorage.setItem('is_process_completed', true);
 };
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
@@ -723,13 +760,30 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     }
     case messages.EXTRACTMSGCONNECTION: {
       const data = JSON.parse(localStorage.getItem('msgConnections'));
-      sendResponse({ data: data });
+      const countData = JSON.parse(localStorage.getItem('counts'));
+      sendResponse({ data: data, countData: countData });
       break;
     }
     case messages.LOADMOREMSGCONNECTION: {
       loadNextMsgConnection(request);
       sendResponse({ status: 'OK' });
       return true;
+    }
+    case messages.REMOVE_EXISTING_DATA: {
+      localStorage.removeItem('msgConnections');
+      localStorage.removeItem('counts');
+      localStorage.removeItem('is_process_completed');
+      sendResponse({ status: messages.OK });
+      break;
+    }
+    case messages.SETPROCESSFLAG: {
+      localStorage.setItem('is_process_completed', false);
+      break;
+    }
+    case messages.CHECKPROCESSFLAG: {
+      let processStatus = localStorage.getItem('is_process_completed');
+      sendResponse({ processStatus });
+      break;
     }
     default:
       break;

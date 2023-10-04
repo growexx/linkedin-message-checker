@@ -29,7 +29,10 @@ export const messages = {
   EXTRACTPAGENUMBER: 'extractPageNumber',
   SCROLLMSGCONNECTION: 'scrollMsgConnection',
   LOADMOREMSGCONNECTION: 'loadMoreMsgConnection',
-  EXTRACTMSGCONNECTION: 'extractMsgConnection'
+  EXTRACTMSGCONNECTION: 'extractMsgConnection',
+  REMOVE_EXISTING_DATA: 'removeExistingData',
+  SETPROCESSFLAG: 'setProcessFlag',
+  CHECKPROCESSFLAG: 'checkProcessFlag'
 };
 
 export const messageConfig = {
@@ -54,24 +57,34 @@ export const conditions = {
   CURRENT_USER_YOU_CONDITION: 'You:'
 };
 
+export const endNumber = 100;
+
 export const declinedTextArr = [
   'You:',
-  'Thank you',
-  'Ok',
-  'ok',
-  'Okay',
+  // 'Thank you',
+  // 'Ok',
+  // 'ok',
+  // 'Okay',
+  // 'Congratulations!',
+  // 'Congratulations',
+  // 'congrats',
+  // 'Congo',
   'Happy Birthday!',
   'Happy Birthday',
-  'You sent a post',
-  'You sent an attachment',
-  'Thanks',
-  'No problem',
-  'Any time',
-  'No worries',
-  'form',
-  'You\'re welcome',
-  'Sponsored',
-  'Thanks for letting me know'
+  // 'You sent a post',
+  // 'You sent an attachment',
+  // 'Thanks',
+  // 'No problem',
+  // 'Any time',
+  // 'No worries',
+  // 'form',
+  // 'You\'re welcome',
+  // 'Sponsored',
+  // 'Thanks for letting me know',
+  // 'Fine',
+  'Happy Work Anniversary',
+  'Happy Anniversary',
+  'Happy Marriage Anniversary'
 ];
 
 export const searchStringForNotification = 'new notification';
