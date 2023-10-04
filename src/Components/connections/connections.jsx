@@ -26,12 +26,12 @@ function Connections () {
     getTabDetails();
   }, []);
 
-  const openMessageBox = async (profile) => {
-    return await chrome.tabs.sendMessage(tabDetails.tab.id, {
-      message: messages.OPEN_PROFILE,
-      url: profile
-    });
-  };
+const openMessageBox = async (profile) => {
+  return await chrome.tabs.sendMessage(tabDetails.tab.id, {
+    message: messages.OPEN_PROFILE,
+    url: profile
+  });
+};
 
   const extractMessageConnections = async () => {
     try {
@@ -44,21 +44,33 @@ function Connections () {
       );
       if (profileNavigateResponse.status === 'OK') {
         await new Promise((resolve) => setTimeout(resolve, 7000));
+        await chrome.tabs.sendMessage(tabDetails.tab.id, {
+            message: messages.SETPROCESSFLAG
+          }
+        );
         // eslint-disable-next-line no-unused-vars
         const scrollResponse = await chrome.tabs.sendMessage(tabDetails.tab.id, {
           message: messages.SCROLLMSGCONNECTION
         });
-        await new Promise((resolve) => setTimeout(resolve, 70000));
-        const extractMsgConnection = await chrome.tabs.sendMessage(
-          tabDetails.tab.id,
-          {
-            message: messages.EXTRACTMSGCONNECTION
+        while (true) {
+          let processStatus = await chrome.tabs.sendMessage(tabDetails.tab.id, {
+            message: messages.CHECKPROCESSFLAG
+          });
+          if (processStatus.processStatus == 'true') {
+            const extractMsgConnection = await chrome.tabs.sendMessage(
+              tabDetails.tab.id,
+              {
+                message: messages.EXTRACTMSGCONNECTION
+              }
+            );
+            if (extractMsgConnection) {
+              setMsgConnection(extractMsgConnection.data.finalMsgConnections);
+              setCountData(extractMsgConnection.countData);
+              setLoading(false);
+            }
+            break;
           }
-        );
-        if (extractMsgConnection) {
-          setMsgConnection(extractMsgConnection.data.finalMsgConnections);
-          setCountData(extractMsgConnection.countData);
-          setLoading(false);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       }
     } catch (error) {
@@ -66,6 +78,14 @@ function Connections () {
       setMsgConnection([]);
       message.error(error.message);
     }
+  };
+
+  const extractFromPageRange = async () => {
+    chrome.tabs.sendMessage(tabDetails.tab.id, {
+      message: messages.REMOVE_EXISTING_DATA
+    });
+    setLoading(true);
+    await extractMessageConnections();
   };
 
   const customSort = (rows, selector, direction) => {
@@ -87,14 +107,6 @@ function Connections () {
 
   const handleSortKey = (key) => {
     setSortKey(key.id);
-  };
-
-  const extractFromPageRange = async () => {
-    chrome.tabs.sendMessage(tabDetails.tab.id, {
-      message: messages.REMOVE_EXISTING_DATA
-    });
-    setLoading(true);
-    await extractMessageConnections();
   };
 
   const convertMsg = (value) => {

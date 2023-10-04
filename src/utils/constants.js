@@ -30,7 +30,9 @@ export const messages = {
   SCROLLMSGCONNECTION: 'scrollMsgConnection',
   LOADMOREMSGCONNECTION: 'loadMoreMsgConnection',
   EXTRACTMSGCONNECTION: 'extractMsgConnection',
-  REMOVE_EXISTING_DATA: 'removeExistingData'
+  REMOVE_EXISTING_DATA: 'removeExistingData',
+  SETPROCESSFLAG: 'setProcessFlag',
+  CHECKPROCESSFLAG: 'checkProcessFlag'
 };
 
 export const messageConfig = {

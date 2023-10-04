@@ -581,7 +581,7 @@ const scrollMsgConnection = async () => {
             'block mlA mrA artdeco-button artdeco-button--muted artdeco-button--1 artdeco-button--tertiary ember-view'
           )[0];
           element.click();
-      } else if (count > endNumber) {
+      } else {
         extractMsgConnection(filteredMsg);
         return true;
       }
@@ -687,6 +687,7 @@ const extractMsgConnection = async (filteredMsg) => {
       falseCount
     })
   );
+  localStorage.setItem('is_process_completed', true);
 };
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
@@ -771,9 +772,19 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     case messages.REMOVE_EXISTING_DATA: {
       localStorage.removeItem('msgConnections');
       localStorage.removeItem('counts');
+      localStorage.removeItem('is_process_completed');
       sendResponse({ status: messages.OK });
       break;
-  }
+    }
+    case messages.SETPROCESSFLAG: {
+      localStorage.setItem('is_process_completed', false);
+      break;
+    }
+    case messages.CHECKPROCESSFLAG: {
+      let processStatus = localStorage.getItem('is_process_completed');
+      sendResponse({ processStatus });
+      break;
+    }
     default:
       break;
   }
